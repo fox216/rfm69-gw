@@ -33,9 +33,9 @@ byte inputLen=0;
 byte buff[MAX_PAYLOAD_SIZE];
 
 void loop() {
-	Blink(LED, 20);
+	
 	// READ Serial input if avaiable...
-	if (Serial.available() > 3) {
+	if (Serial.available() > 0) {
 		// Read serial data into buffer
 		// METHOD 1 Blind read, no limit (Risky?)
 		
@@ -47,12 +47,12 @@ void loop() {
 		//Serial.readBytesUntil(10, buff, MAX_PAYLOAD_SIZE);
 		// Interpret serial data as gateway msg
 		gwMsg = *(MoteinoMsg*)buff;
+		Blink(LED, 20);
+		Serial.print("NodeID = ");
+		Serial.println(gwMsg.NodeID);
+		Serial.print("MsgID = ");
+		Serial.println(gwMsg.MsgID);
 	}
-	Serial.print("NodeID = ");
-	Serial.println(gwMsg.NodeID);
-	Serial.print("MsgID = ");
-	Serial.println(gwMsg.MsgID);
-
 
 
 
