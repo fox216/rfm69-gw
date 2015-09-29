@@ -30,17 +30,17 @@ void setup() {
 byte ackCount=0;
 byte inputLen=0;
 //char input[64];
-byte buff[MAX_PAYLOAD_SIZE];
+byte buff[MAX_MESSAGE_SIZE];
 
 void loop() {
 	
 	// READ Serial input if avaiable...
-	if (Serial.available() > 0) {
+	if (Serial.available() > 4) {
 		// Read serial data into buffer
 		// METHOD 1 Blind read, no limit (Risky?)
-		
+		int count=0;
 		while (Serial.available() > 0) {
-			byte buff = (byte)Serial.read();
+			buff[count] = (byte)Serial.read();
 		}
 		
 		// METHOD 2 Read until new line
@@ -49,9 +49,9 @@ void loop() {
 		gwMsg = *(MoteinoMsg*)buff;
 		Blink(LED, 20);
 		Serial.print("NodeID = ");
-		Serial.println(gwMsg.NodeID);
+		Serial.println(gwMsg.NodeID, HEX);
 		Serial.print("MsgID = ");
-		Serial.println(gwMsg.MsgID);
+		Serial.println(gwMsg.MsgID, HEX);
 	}
 
 
