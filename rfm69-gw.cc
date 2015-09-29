@@ -35,12 +35,17 @@ byte buff[MAX_MESSAGE_SIZE];
 void loop() {
 	
 	// READ Serial input if avaiable...
-	if (Serial.available() > 4) {
+	if (Serial.available() > 0) {
 		// Read serial data into buffer
 		// METHOD 1 Blind read, no limit (Risky?)
 		int count=0;
 		while (Serial.available() > 0) {
 			buff[count] = (byte)Serial.read();
+			if (count >= MAX_MESSAGE_SIZE || (char)buff[count] == '\n') {
+				// Break on delimiter or limit
+				break;
+			}
+			count++;
 		}
 		
 		// METHOD 2 Read until new line
