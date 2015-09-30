@@ -31,23 +31,44 @@ byte ackCount=0;
 byte inputLen=0;
 //char input[64];
 byte buff[MAX_MESSAGE_SIZE];
-
+byte frameBuff[FRAME_BUFFER_SIZE];
 void loop() {
 	
 	// READ Serial input if avaiable...
-	if (Serial.available() > 0) {
+	if (Serial.available() > 3) {
+		//Wait for serial buffer to fill
+		delay(1200);
 		// Read serial data into buffer
 		// METHOD 1 Blind read, no limit (Risky?)
 		int count=0;
-		while (Serial.available() > 0) {
-			buff[count] = (byte)Serial.read();
+		//int frameCount=0;
+
+		for (int x = 0; x<FRAME_BUFFER_SIZE; x++) { //Read first three 
+			frameBuff[x] = (byte)Serial.read();
+		}
+		sFrame = *(SerialFrame*)frameBuff;
+		Serial.print("FrameValidation = ");
+		Serial.println(sFrame.fHeader, HEX);
+		Serial.print("FrameSize = ");
+		Serial.println(sFrame.size, DEC);
+	
+
+		//while (Serial.available() > 0) {
+		for (int y = 0; y < (int)sFrame.size; y++) {
+			buff[y] = (byte)Serial.read();
+			Serial.print("x");
+
+			/*
 			if (count >= MAX_MESSAGE_SIZE || (char)buff[count] == '\n') {
 				// Break on delimiter or limit
+				Serial.println("Max or Delimiter Reached!");
 				break;
 			}
 			count++;
+			*/
 		}
-		
+		Serial.println();
+		//Serial.flush();
 		// METHOD 2 Read until new line
 		//Serial.readBytesUntil(10, buff, MAX_PAYLOAD_SIZE);
 		// Interpret serial data as gateway msg
