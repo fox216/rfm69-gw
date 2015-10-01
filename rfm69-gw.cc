@@ -2,8 +2,17 @@
 |PC| <-serial-> |Moteino_Gw| <-RFM69W-> |Target_Moteino|
 
 NOTE: Endian Conversion Required to properly read encoded data
-Linux = Little Endian
+https://docs.python.org/2/library/struct.html
+Linux = Little Endian (Python conversion table)
 Moteino =  Big endian
+Data Type Cross Reference Table
+--------------------------------
+Type	Linux(python)	Moteino
+byte 	char(1)			byte(1)
+int 	short(2)		int(2)
+long 	long(4) 		long(4)
+float 	float(4)		float(4)
+
 ***************************************************************************/
 
 
