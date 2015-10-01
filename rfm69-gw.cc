@@ -1,7 +1,9 @@
 /************************************************************************** 
 |PC| <-serial-> |Moteino_Gw| <-RFM69W-> |Target_Moteino|
 
-
+NOTE: Endian Conversion Required to properly read encoded data
+Linux = Little Endian
+Moteino =  Big endian
 ***************************************************************************/
 
 
@@ -42,7 +44,7 @@ void loop() {
 		// METHOD 1 Blind read, no limit (Risky?)
 		int count=0;
 		//int frameCount=0;
-
+		// Read header - determine if packet is valid, get sise of message
 		for (int x = 0; x<FRAME_BUFFER_SIZE; x++) { //Read first three 
 			frameBuff[x] = (byte)Serial.read();
 		}
