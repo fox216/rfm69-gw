@@ -41,8 +41,9 @@ void setup() {
 byte ackCount=0;
 byte inputLen=0;
 //char input[64];
-byte buff[MAX_MESSAGE_SIZE];
+byte buff[MAX_SERIAL_SIZE];
 byte frameBuff[FRAME_BUFFER_SIZE];
+byte nBuff[MAX_NETWORK_SIZE];
 void loop() {
 	
 	// READ Serial input if avaiable...
@@ -62,13 +63,86 @@ void loop() {
 
 		// read until the serial buffer is empty
 		while (Serial.available() > 0) {
-			frameBuff[count] = (byte)Serial.read();
+			buff[count] = (byte)Serial.read();
 			count++;
 		}
+
+
+
 		Serial.print("Count = ");
 		Serial.println(count);
+	 // End read data from serial 
 
-		sFrame = *(SerialFrame*)frameBuff;
+	// read SerialFrame
+	for (int b =0; b < FRAME_BUFFER_SIZE; b++) {
+		frameBuff[b] = buff[b];
+	}
+	sFrame = *(SerialFrame*)frameBuff;
+
+	if (sFrame.fDelimiter == 0) {
+		// Valid Message
+		Serial.print("NodeID = ");
+		Serial.println(sFrame.NodeID);
+
+		Serial.print("Message ID = ");
+		Serial.println(sFrame.MsgID);
+
+		Serial.print("Message Type = ");
+		Serial.println(sFrame.MsgType);
+
+		Serial.print("Message Size = ");
+		Serial.println(sFrame.MsgSize);
+		// Load Message
+		int nCount = 0;
+		for (int m = FRAME_BUFFER_SIZE; m < FRAME_BUFFER_SIZE + sFrame.MsgSize; m++) {
+			nBuff[nCount] = buff[m];
+			nCount++;
+		}
+		/*
+			Test Message
+			'\x00\x00\x04\x20\x0a\xf0\x14\xae\x61\x42\x2a\x00\x00\x00'
+			f1 = 56.42
+			li = 42
+		*/		
+		Serial.print("!! nCount = ");
+		Serial.println(nCount);
+	} else {
+		// Invalid message
+		Serial.println("DEBUG Invalid Message Discard!");
+		
+		Serial.print("Frame Delimiter = ");
+		Serial.print(sFrame.fDelimiter);
+
+		Serial.print("NodeID = ");
+		Serial.print(sFrame.NodeID);
+
+		Serial.print("Message ID = ");
+		Serial.println(sFrame.MsgID);
+
+		Serial.print("Message Type = ");
+		Serial.println(sFrame.MsgType);
+
+		Serial.print("Message Size = ");
+		Serial.print(sFrame.MsgSize);
+	}	
+
+	if (sFrame.NodeID == 0) {
+		Serial.println("Echo Request to Serial Gateway!!");
+		tMsg = *(TestMsg*)nBuff;
+
+		Serial.print("Test Size = ");
+		Serial.println(tMsg.size);
+
+		Serial.print("Test f1 = ");
+		Serial.println(tMsg.f1);
+
+		Serial.print("Test l1 = ");
+		Serial.println(tMsg.l1);
+
+	}
+
+	/*
+		sFrame = *(SerialFrame*)buff;
 		
 		Serial.print("FrameValidation = ");
 		Serial.println(sFrame.fHeader);
@@ -81,8 +155,9 @@ void loop() {
 		
 		Serial.print("Long = ");
 		Serial.println(sFrame.l1);
-	
+	*/
 		Blink(LED, 20);
+	}
 		//delay(2000);
 		/*
 		//while (Serial.available() > 0) {
@@ -111,7 +186,7 @@ void loop() {
 		Serial.print("MsgID = ");
 		Serial.println(gwMsg.MsgID, HEX);
 		*/
-	}
+	
 
 
 

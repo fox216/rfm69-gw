@@ -44,9 +44,10 @@ Developer Notes
 #else
 #include <Arduino.h>
 #endif
-#define FRAME_BUFFER_SIZE 11
-#define MAX_MESSAGE_SIZE 61
-#define MAX_PAYLOAD_SIZE 59 // Package size in payload
+#define FRAME_BUFFER_SIZE 5
+#define MAX_SERIAL_SIZE 70 
+#define MAX_NETWORK_SIZE 61
+//#define MAX_PAYLOAD_SIZE 59 // Package size in payload
 #define WATCHDOG_DEFAULT 10000 // 10 seconds used by node
 /*---------------------------------------------
 |	!! PKG Types !!
@@ -56,19 +57,20 @@ Developer Notes
 
 
 // Gateway Message Structure 
-typedef struct {		
-  byte 				NodeID;
-  byte 				MsgID;					
-  byte           	Payload[MAX_PAYLOAD_SIZE];  // 61 bytes
-} MoteinoMsg;
-MoteinoMsg gwMsg;
+typedef struct {
+  byte 				fDelimiter;		
+  byte 				NodeID; // Address of target sensor (00 for echo to gateway)
+  byte 				MsgID;	// Coordination ID to ack/nak
+  byte 				MsgType; // Message type - Struct Decode
+  byte 				MsgSize; // Length structure to read
+} SerialFrame;
+SerialFrame sFrame;
 
 typedef struct { 
-	unsigned int	fHeader; 	// Python short(2)
 	byte 			size; 		// Python B (1)
 	float			f1;			// Python f (4)
 	long 			l1;			// Python l (4)
-} SerialFrame;
-SerialFrame sFrame;
+} TestMsg;
+TestMsg tMsg;
 
 #endif
