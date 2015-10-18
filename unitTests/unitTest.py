@@ -30,6 +30,7 @@ if __name__ == '__main__':
 
 # Convert Float to hex
 import struct
+import serial
 
 def check_length(s):
 	'''
@@ -70,5 +71,12 @@ def uint_to_hex(u):
 	'''
 	return hex(struct.unpack('>I', struct.pack('<I', u))[0])[2:]	
 
-#if '__name__' = '__main__':
+if '__name__' = '__main__':
+import serial
+
+s = serial.Serial('/dev/ttyBlue', 115200, timeout=0.25)
+s.readline()
+s.write('\x00\x00\x0a\x04\x20\xf0\x14\xae\x61\x42\x2a\x00\x00\x00')
+s.readline()
+
 
