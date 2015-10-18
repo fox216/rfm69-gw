@@ -44,7 +44,7 @@ Developer Notes
 #else
 #include <Arduino.h>
 #endif
-#define FRAME_BUFFER_SIZE 3
+#define FRAME_BUFFER_SIZE 11
 #define MAX_MESSAGE_SIZE 61
 #define MAX_PAYLOAD_SIZE 59 // Package size in payload
 #define WATCHDOG_DEFAULT 10000 // 10 seconds used by node
@@ -63,10 +63,11 @@ typedef struct {
 } MoteinoMsg;
 MoteinoMsg gwMsg;
 
-typedef struct { // total header size 3 bytes
-	unsigned int	fHeader; //100 dec
-	byte 			size; // Size of gwMsg
-//	struct MoteinoMsg	gwMsg;
+typedef struct { 
+	unsigned int	fHeader; 	// Python short(2)
+	byte 			size; 		// Python B (1)
+	float			f1;			// Python f (4)
+	long 			l1;			// Python l (4)
 } SerialFrame;
 SerialFrame sFrame;
 

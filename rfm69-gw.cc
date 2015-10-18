@@ -46,7 +46,7 @@ byte frameBuff[FRAME_BUFFER_SIZE];
 void loop() {
 	
 	// READ Serial input if avaiable...
-	if (Serial.available() > 3) {
+	if (Serial.available() > 0) {
 		//Wait for serial buffer to fill
 		delay(1200);
 		// Read serial data into buffer
@@ -54,29 +54,50 @@ void loop() {
 		int count=0;
 		//int frameCount=0;
 		// Read header - determine if packet is valid, get sise of message
+		/*
 		for (int x = 0; x<FRAME_BUFFER_SIZE; x++) { //Read first three 
 			frameBuff[x] = (byte)Serial.read();
 		}
-		sFrame = *(SerialFrame*)frameBuff;
-		Serial.print("FrameValidation = ");
-		Serial.println(sFrame.fHeader, HEX);
-		Serial.print("FrameSize = ");
-		Serial.println(sFrame.size, DEC);
-	
+		*/
 
+		// read until the serial buffer is empty
+		while (Serial.available() > 0) {
+			frameBuff[count] = (byte)Serial.read();
+			count++;
+		}
+		Serial.print("Count = ");
+		Serial.println(count);
+
+		sFrame = *(SerialFrame*)frameBuff;
+		
+		Serial.print("FrameValidation = ");
+		Serial.println(sFrame.fHeader);
+		
+		Serial.print("FrameSize = ");
+		Serial.println(sFrame.size);
+		
+		Serial.print("Float = ");
+		Serial.println(sFrame.f1);
+		
+		Serial.print("Long = ");
+		Serial.println(sFrame.l1);
+	
+		Blink(LED, 20);
+		//delay(2000);
+		/*
 		//while (Serial.available() > 0) {
 		for (int y = 0; y < (int)sFrame.size; y++) {
 			buff[y] = (byte)Serial.read();
 			Serial.print("x");
 
-			/*
+			
 			if (count >= MAX_MESSAGE_SIZE || (char)buff[count] == '\n') {
 				// Break on delimiter or limit
 				Serial.println("Max or Delimiter Reached!");
 				break;
 			}
 			count++;
-			*/
+			
 		}
 		Serial.println();
 		//Serial.flush();
@@ -84,11 +105,12 @@ void loop() {
 		//Serial.readBytesUntil(10, buff, MAX_PAYLOAD_SIZE);
 		// Interpret serial data as gateway msg
 		gwMsg = *(MoteinoMsg*)buff;
-		Blink(LED, 20);
+		
 		Serial.print("NodeID = ");
 		Serial.println(gwMsg.NodeID, HEX);
 		Serial.print("MsgID = ");
 		Serial.println(gwMsg.MsgID, HEX);
+		*/
 	}
 
 
