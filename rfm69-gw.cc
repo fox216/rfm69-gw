@@ -42,8 +42,7 @@ byte ackCount=0;
 byte inputLen=0;
 //char input[64];
 byte buff[MAX_SERIAL_SIZE];
-byte frameBuff[FRAME_BUFFER_SIZE];
-byte nBuff[MAX_NETWORK_SIZE];
+byte debugMsg[MAX_NETWORK_SIZE];
 void loop() {
 	
 	// READ Serial input if avaiable...
@@ -53,13 +52,6 @@ void loop() {
 		// Read serial data into buffer
 		// METHOD 1 Blind read, no limit (Risky?)
 		int count=0;
-		//int frameCount=0;
-		// Read header - determine if packet is valid, get sise of message
-		/*
-		for (int x = 0; x<FRAME_BUFFER_SIZE; x++) { //Read first three 
-			frameBuff[x] = (byte)Serial.read();
-		}
-		*/
 
 		// read until the serial buffer is empty
 		while (Serial.available() > 0) {
@@ -67,68 +59,50 @@ void loop() {
 			count++;
 		}
 
-
-
 		Serial.print("Count = ");
 		Serial.println(count);
 	 // End read data from serial 
+	// read Serial Message
+	sMsg = *(SerialMsg*)buff;
 
-	// read SerialFrame
-	for (int b =0; b < FRAME_BUFFER_SIZE; b++) {
-		frameBuff[b] = buff[b];
-	}
-	sFrame = *(SerialFrame*)frameBuff;
-
-	if (sFrame.fDelimiter == 0) {
+	if (sMsg.fDelimiter == 0) {
 		// Valid Message
 		Serial.print("NodeID = ");
-		Serial.println(sFrame.NodeID);
-
-		Serial.print("Message ID = ");
-		Serial.println(sFrame.MsgID);
-
-		Serial.print("Message Type = ");
-		Serial.println(sFrame.MsgType);
+		Serial.println(sMsg.NodeID);
 
 		Serial.print("Message Size = ");
-		Serial.println(sFrame.MsgSize);
+		Serial.println(sMsg.MsgSize);
 		// Load Message
-		int nCount = 0;
-		for (int m = FRAME_BUFFER_SIZE; m < FRAME_BUFFER_SIZE + sFrame.MsgSize; m++) {
-			nBuff[nCount] = buff[m];
-			nCount++;
-		}
+		
 		/*
 			Test Message
-			'\x00\x00\x04\x20\x0a\xf0\x14\xae\x61\x42\x2a\x00\x00\x00'
+			'\x00\x00\x0a\x04\x20\xf0\x14\xae\x61\x42\x2a\x00\x00\x00'
 			f1 = 56.42
 			li = 42
 		*/		
-		Serial.print("!! nCount = ");
-		Serial.println(nCount);
 	} else {
 		// Invalid message
 		Serial.println("DEBUG Invalid Message Discard!");
 		
 		Serial.print("Frame Delimiter = ");
-		Serial.print(sFrame.fDelimiter);
+		Serial.print(sMsg.fDelimiter);
 
 		Serial.print("NodeID = ");
-		Serial.print(sFrame.NodeID);
-
-		Serial.print("Message ID = ");
-		Serial.println(sFrame.MsgID);
-
-		Serial.print("Message Type = ");
-		Serial.println(sFrame.MsgType);
+		Serial.print(sMsg.NodeID);
 
 		Serial.print("Message Size = ");
-		Serial.print(sFrame.MsgSize);
+		Serial.print(sMsg.MsgSize);
 	}	
 
-	if (sFrame.NodeID == 0) {
+	if (sMsg.NodeID == 0) {
 		Serial.println("Echo Request to Serial Gateway!!");
-		tMsg = *(TestMsg*)nBuff;
+		tMsg = *(TestMsg*)sMsg.Payload;
+
+		Serial.print("Message ID = ");
+		Serial.println(tMsg.MsgID);
+
+		Serial.print("Message Type = ");
+		Serial.println(tMsg.MsgType);
 
 		Serial.print("Test Size = ");
 		Serial.println(tMsg.size);

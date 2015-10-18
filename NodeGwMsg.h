@@ -60,13 +60,14 @@ Developer Notes
 typedef struct {
   byte 				fDelimiter;		
   byte 				NodeID; // Address of target sensor (00 for echo to gateway)
-  byte 				MsgID;	// Coordination ID to ack/nak
-  byte 				MsgType; // Message type - Struct Decode
   byte 				MsgSize; // Length structure to read
-} SerialFrame;
-SerialFrame sFrame;
+  byte  			Payload[MAX_NETWORK_SIZE];
+} SerialMsg;
+SerialMsg sMsg;
 
 typedef struct { 
+	byte 			MsgID;	// Coordination ID to ack/nak
+  	byte 			MsgType; // Message type - Struct Decode
 	byte 			size; 		// Python B (1)
 	float			f1;			// Python f (4)
 	long 			l1;			// Python l (4)
