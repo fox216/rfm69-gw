@@ -58,20 +58,20 @@ Developer Notes
 
 // Gateway Message Structure 
 typedef struct {
-  byte 				fDelimiter;		
+  byte 				SerialDelimiter;		
   byte 				NodeID; // Address of target sensor (00 for echo to gateway)
-  byte 				MsgSize; // Length structure to read
-  byte  			Payload[MAX_NETWORK_SIZE];
+  byte 				SerialPayloadSize; // Length structure to read
+  byte  			SerialPayload[MAX_NETWORK_SIZE];
 } SerialMsg;
 SerialMsg sMsg;
 
-typedef struct { 
-	byte 			MsgID;	// Coordination ID to ack/nak
-  	byte 			MsgType; // Message type - Struct Decode
-	byte 			size; 		// Python B (1)
-	float			f1;			// Python f (4)
-	long 			l1;			// Python l (4)
-} TestMsg;
-TestMsg tMsg;
+typedef struct {
+	byte 			MsgID;	// Coordination ID to ack/nak (unknown if needed for applications)
+  	byte 			MsgType; // Message type - Struct Decode (10)
+  	byte 			msg[59]; // Allocate remaining msg space for possible payload. Payload is node specific
+} Payload;
+Payload payload;
+
+
 
 #endif

@@ -33,22 +33,19 @@ void setup() {
   delay(10);
   radio.initialize(FREQUENCY,NODEID,NETWORKID);
   radio.encrypt(KEY);
-  //char buff[50]; // Write to serial buffer 
-  //sprintf(buff, "\nListening at %d Mhz...", FREQUENCY==RF69_433MHZ ? 433 : FREQUENCY==RF69_868MHZ ? 868 : 915);
-  //DEBUGln(buff);
+
 }
 
 byte ackCount=0;
 byte inputLen=0;
 //char input[64];
 byte buff[MAX_SERIAL_SIZE];
-byte debugMsg[MAX_NETWORK_SIZE];
 void loop() {
 	
 	// READ Serial input if avaiable...
 	if (Serial.available() > 0) {
 		//Wait for serial buffer to fill
-		delay(1200);
+		delay(100);
 		// Read serial data into buffer
 		// METHOD 1 Blind read, no limit (Risky?)
 		int count=0;
@@ -65,13 +62,13 @@ void loop() {
 	// read Serial Message
 	sMsg = *(SerialMsg*)buff;
 
-	if (sMsg.fDelimiter == 0) {
+	if (sMsg.SerialDelimiter == 0) {
 		// Valid Message
 		Serial.print("NodeID = ");
 		Serial.println(sMsg.NodeID);
 
 		Serial.print("Message Size = ");
-		Serial.println(sMsg.MsgSize);
+		Serial.println(sMsg.SerialPayloadSize);
 		// Load Message
 		
 		/*
@@ -80,90 +77,45 @@ void loop() {
 			f1 = 56.42
 			li = 42
 		*/		
-	} else {
-		// Invalid message
-		Serial.println("DEBUG Invalid Message Discard!");
-		
-		Serial.print("Frame Delimiter = ");
-		Serial.print(sMsg.fDelimiter);
-
-		Serial.print("NodeID = ");
-		Serial.print(sMsg.NodeID);
-
-		Serial.print("Message Size = ");
-		Serial.print(sMsg.MsgSize);
-	}	
-
-	if (sMsg.NodeID == 0) {
-		Serial.println("Echo Request to Serial Gateway!!");
-		tMsg = *(TestMsg*)sMsg.Payload;
-
+		// Get Payload from Serial Payload
+		payload = *(Payload*)sMsg.SerialPayload;
 		Serial.print("Message ID = ");
-		Serial.println(tMsg.MsgID);
+		Serial.println(payload.MsgID);
 
 		Serial.print("Message Type = ");
-		Serial.println(tMsg.MsgType);
+		Serial.println(payload.MsgType);
 
-		Serial.print("Test Size = ");
-		Serial.println(tMsg.size);
+		Serial.print("LED Number = ");
+		Serial.println(sMsg.SerialPayload[2]);
 
-		Serial.print("Test f1 = ");
-		Serial.println(tMsg.f1);
+		Serial.print("LED State = ");
+		Serial.println(sMsg.SerialPayload[3]);
 
-		Serial.print("Test l1 = ");
-		Serial.println(tMsg.l1);
-
-	}
-
-	/*
-		sFrame = *(SerialFrame*)buff;
-		
-		Serial.print("FrameValidation = ");
-		Serial.println(sFrame.fHeader);
-		
-		Serial.print("FrameSize = ");
-		Serial.println(sFrame.size);
-		
-		Serial.print("Float = ");
-		Serial.println(sFrame.f1);
-		
-		Serial.print("Long = ");
-		Serial.println(sFrame.l1);
-	*/
-		Blink(LED, 20);
-	}
-		//delay(2000);
 		/*
-		//while (Serial.available() > 0) {
-		for (int y = 0; y < (int)sFrame.size; y++) {
-			buff[y] = (byte)Serial.read();
-			Serial.print("x");
+			Turn on Light # 7
+			\x00\x2a\x04\x05\x0a\x07\x01
 
-			
-			if (count >= MAX_MESSAGE_SIZE || (char)buff[count] == '\n') {
-				// Break on delimiter or limit
-				Serial.println("Max or Delimiter Reached!");
-				break;
-			}
-			count++;
-			
-		}
-		Serial.println();
-		//Serial.flush();
-		// METHOD 2 Read until new line
-		//Serial.readBytesUntil(10, buff, MAX_PAYLOAD_SIZE);
-		// Interpret serial data as gateway msg
-		gwMsg = *(MoteinoMsg*)buff;
-		
-		Serial.print("NodeID = ");
-		Serial.println(gwMsg.NodeID, HEX);
-		Serial.print("MsgID = ");
-		Serial.println(gwMsg.MsgID, HEX);
+			Turn off Light # 7
+			\x00\x2a\x04\x05\x0a\x07\x00
 		*/
-	
+		//memcpy(o_payload.msg, &sMsg.SerialPayload, sizeof(sMsg.SerialPayloadSize));
+		radio.sendWithRetry(sMsg.NodeID, (const void*)(&sMsg.SerialPayload), sMsg.SerialPayloadSize);
 
+	} else {
+		// !!!!!! Invalid message
+		Serial.println("DEBUG Invalid Message Discard!");
+		// Print debug info about message
+		Serial.print("[DEBUG]Serial Delimiter = ");
+		Serial.println(sMsg.SerialDelimiter);
 
+		Serial.print("[DEBUG]NodeID = ");
+		Serial.println(sMsg.NodeID);
 
+		Serial.print("[DEBUG]Message Size = ");
+		Serial.println(sMsg.SerialPayloadSize);
+	}	
+		Blink(LED, 10);
+	}
 }
 
 void Blink(byte PIN, int DELAY_MS)
